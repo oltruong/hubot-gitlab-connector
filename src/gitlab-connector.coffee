@@ -16,7 +16,7 @@
 #   Olivier Truong <olivier@oltruong.com>
 
 
-# /api/v4/projects?search=caravan"
+# /api/v4/projects?search=myproject"
 
 module.exports = (robot) ->
   robot.respond /gitlab (.*)/, (res) ->
@@ -26,7 +26,8 @@ module.exports = (robot) ->
     command = res.match[1]
 
     switch command
-      when "project" then listProject(res,url,token)
+      when "project" then listProject(robot, res, url, token)
+      when "version" then sendVersion(robot, res, url, token)
       when "help" then sendHelp(res)
       else
         sendUnknownCommand(res)
@@ -38,12 +39,17 @@ module.exports = (robot) ->
 #
 #    else
 
-listProject = (res,url,token) ->
-#  robot.http(url)
-#    .header('Accept', 'application/json')
-#    .get() (err, res, body) ->
-#    data = JSON.parse body
-  res.reply "hello!"
+listProject = (robot, res, url, token) ->
+  robot.http('http://gitlab.com').header('Accept', 'application/json').path('/hello').get() (err, response, body) ->
+    res.reply body
+
+#  res.reply "hello"
+sendVersion = (robot, res, url, token) ->
+  robot.http('http://gitlab.com')
+    .header('Accept', 'application/json')
+    .path('/version')
+    .get() (err, response, body) ->
+    res.reply body
 
 sendHelp = (res) ->
   res.reply "help's on the way"
