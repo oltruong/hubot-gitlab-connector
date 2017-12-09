@@ -20,7 +20,7 @@ describe 'gitlab-connector commands with http connection', ->
     co =>
       @room.user.say('alice', '@hubot gitlab project')
       new Promise((resolve, reject) ->
-        setTimeout(resolve, 20);
+        setTimeout(resolve, 1000);
       )
   afterEach ->
     @room.destroy()
