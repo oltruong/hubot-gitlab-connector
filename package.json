@@ -1,6 +1,6 @@
 {
   "name": "hubot-gitlab-connector",
-  "description": "A hubot script that communicates with Gitlab",
+  "description": "A hubot script that communicates with Gitlab API",
   "version": "0.0.1",
   "author": "Olivier Truong <olivier@oltruong.com",
   "license": "MIT",
@@ -19,7 +19,7 @@
     "chai": "^2.1.1",
     "chai-as-promised": "^7.1.1",
     "co": "^4.6.0",
-    "coffee-script": "1.6.3",
+    "coffeescript": "2.1.0",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-watch": "~0.6.1",
