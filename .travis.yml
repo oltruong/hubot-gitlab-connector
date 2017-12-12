@@ -1,11 +1,27 @@
 language: node_js
 node_js:
-  - "node"
-  - "lts/*"
-  - "8"
-  - "7"
-  - "6"
+- node
+- lts/*
+- '8'
+- '7'
+- '6'
 sudo: false
 cache: yarn
 notifications:
   email: false
+deploy:
+  node_js: node
+  provider: npm
+  email: olivier@nadeva.fr
+  api_key:
+    secure: ZL0fPpL5nEWLESXDSldUgoLlwCePFHX20f9LsaQ3N0nOS9B6B96FEQNKv6MmURVV84U4098wuK1p2w7AU7ytVlsyfBSGDvt5TlacHWpPtZS45GF55Qp6jp+s/zzgwqQsiGc+4h2V/eiNHrDv9Ky5dXjmwDAuQFkug2X2ADIc/xXPRUPWxvZiCmbZ8eNFWe8M/p19xaTmzz2DFXQjrzjK08UajpKSh5hRTmDp9G6Sm5z/dIOsYMSZ2h3dsp/6/5paE7bKL91aeJQOCraBtKdYV7CChtEDpdsJvdjSgMaMujo2OBTtHj5sFzgDtCvHW6eHe1vZMOvVr87uKxEfe3yO28U86uHT713GsfFsmY+D27NfjxDeX7wkBLpDPj68jANJLJw35Nb9eryrL2749h/NXN5hQ6H2pn0YyyVdTwTXYDkQXsDWBUA0rxHUh/yWwr2IaGe3mt/MfKak1D+LdfXh3+NVvjCoX6LhFeXuXFt5hdM00QlOsEYd8OYLi5Y9GjlDSAnoqZKQs113+2xH861aKx3EF/F8D+Inu8t2ki8Wd8/stMJECK0e/SuIIzXJhkEa/yNDj3bN9f9Sh3hAe0i/R5ePqhH9/jDIsCS47HzB29c48XiMQjZdDHqICPYLGMnR6J6Uk3yRj1a3ZCLiFVLdquoBqCHS2hYue/yjb6+HKr0=
+  on:
+    repo: oltruong/hubot-gitlab-connector
+    tags: true
+  provider: releases
+  api_key:
+    secure: UQ710bDILz7B+GKtlFNY/u4jgccy+m2W+ZevAFGzsTedxAMybR6HtOCForrl5G2jUduyirCYR5u10COI/E7qrwDM/aXhC6jrCiHsb4Syhbn3S5F+sLOpiSCRfb++JGbs5urLY8JtOMDyxsn6XYiOHnx8A4cVI78PXcCotC5YZz7WPYPuT1w23qcHC6XFdSuAsJ+khYHVeXxjytmW7uYF6AtuRIwj+H3g+xzUVdUYF+L3T95nQw+0Q3ADlHJpJUUo+Jvp87e2ljYhzORQWKJ35/t3I0eR3VNIAQ71W5qkW0e/bOoE1Zd/zKxx7z8yDLCXLBrUDz/1QtzDZBn17JwsJlAOxTAIvo/kdQj8xepl0vCBFKUqF+FP8aqvZmxvAv05WKskn7DZ2z17CncizLe8T4xoGnXFPbdQGya7dg3Njw0+EKByVWfk24qCcH8i7J2NLH3yEeuTWiyMLbJRYxSOa6U34Oc5ODLp6lsWFQWkZWcd1AGNu5WsK9iMnR8i5BwFE/owV1aHaHK3Nmw6vfL9oPuS+dLoIhLnRxnopHksgp2AAHKcI/nLWvZ3HXVtzS+4eAhZwC2tJHhGlBJdnXuIEqyi835OYoZaT3NcQDWAhMAxm1/uKMf23U0QK4YUm76BqxWFBbNcCYxxJ9Ao1yFJj7RT1RhYw18fk9kHA4i/kss=
+  file: hubot-gitlab-connector-0.0.1.tgz
+  on:
+    repo: oltruong/hubot-gitlab-connector
+    tags: true
