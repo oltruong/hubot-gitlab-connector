@@ -2,15 +2,15 @@
   "name": "hubot-gitlab-connector",
   "description": "A hubot script that communicates with Gitlab API",
   "version": "0.0.2",
-  "author": "Olivier Truong <olivier@oltruong.com",
+  "author": "Olivier Truong <olivier@oltruong.com>",
   "license": "MIT",
   "keywords": "hubot, hubot-scripts, gitlab",
   "repository": {
     "type": "git",
-    "url": "git://github.com/hubot-scripts/hubot-gitlab-connector.git"
+    "url": "git://github.com/oltruong/hubot-gitlab-connector.git"
   },
   "bugs": {
-    "url": "https://github.com/hubot-scripts/hubot-gitlab-connector/issues"
+    "url": "https://github.com/oltruong/hubot-gitlab-connector/issues"
   },
   "peerDependencies": {
     "hubot": "2.x"

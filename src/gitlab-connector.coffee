@@ -27,26 +27,17 @@ module.exports = (robot) ->
     gitlabClient = new GitlabClient(robot, url, token)
 
     switch command[0]
-      when "pipeline" then pipeline(gitlabClient, res, command)
+      when "pipeline" then createPipeline(gitlabClient, res, command)
+      when "branches" then getBranches(gitlabClient, res, command)
       when "version" then getVersion(gitlabClient, res)
       when "help" then sendHelp(res)
       else
-        sendUnknownCommand(res, command)
+        sendUnknownCommand(res, res.match[1])
 
-
-#    if command is "project"
-#
-#    else if command is "help"
-#
-#    else
-
-pipeline = (gitlabClient, res, command) ->
+createPipeline = (gitlabClient, res, command) ->
   if (command.length != 4 || command[1] != 'trigger')
     res.reply "Correct usage is gitlab pipeline trigger \<projectId\> \<branch\> "
     return
-
-  url = process.env.HUBOT_GITLAB_URL
-  token = process.env.HUBOT_GITLAB_TOKEN
 
   projectId = command[2]
   branchName = command[3]
@@ -70,7 +61,8 @@ pipeline = (gitlabClient, res, command) ->
       return
 
     if filter_branch_names.length > 1
-      res.reply "Sorry #{filter_branch_names.length} branches found for #{branchName}. Please be more specific. Here are the branches #{filter_branch_names}"
+      filter_branch_info = filter_branch_names.join('\n')
+      res.reply "Sorry #{filter_branch_names.length} branches found for #{branchName}. Please be more specific. Here are the branches" + '\n' + "#{filter_branch_info}"
       return
 
     branch = filter_branch_names[0]
@@ -102,6 +94,22 @@ pipeline = (gitlabClient, res, command) ->
           data2 = JSON.parse body
           res.reply "Pipeline #{data2.id} created on branch #{branch}"
 
+getBranches = (gitlabClient, res, command) ->
+  if (command.length != 2)
+    res.reply "Correct usage is gitlab branches \<projectId\>"
+    return
+  projectId = command[1]
+  gitlabClient.getBranches(projectId) (err, response, body) ->
+    if err
+      res.send "Encountered an error :( #{err}"
+      return
+    if response.statusCode isnt 200
+      res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
+      return
+    data = JSON.parse body
+    branch_infos = []
+    branch_infos.push "#{branch.name}, last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\"" for branch in data
+    res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n')
 
 getVersion = (gitlabClient, res) ->
   gitlabClient.version() (err, response, body) ->
@@ -112,7 +120,7 @@ getVersion = (gitlabClient, res) ->
     res.reply "gitlab version is #{data.version}, revision #{data.revision}"
 
 sendHelp = (res) ->
-  res.reply HELP
+  res.reply 'Here are all the available commands:' + '\n' + HELP
 
 sendUnknownCommand = (res, command) ->
   res.reply "Sorry, I did not understand command '" + command + "'. Here are all the available commands:" + '\n' + HELP
@@ -121,8 +129,9 @@ sendUnknownCommand = (res, command) ->
 HELP_VERSION = "gitlab version - returns version"
 HELP_DEFAULT = "gitlab help - displays all available commands"
 HELP_PIPELINE = "gitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId"
+HELP_BRANCH = "gitlab branches projectId - shows the branches for the project with Id projectId"
 
-HELP = [HELP_PIPELINE, HELP_VERSION, HELP_DEFAULT].join('\n')
+HELP = [HELP_PIPELINE, HELP_BRANCH, HELP_VERSION, HELP_DEFAULT].join('\n')
 
 class GitlabClient
   constructor: (@robot, @url, @token) ->

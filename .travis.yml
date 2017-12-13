@@ -1,10 +1,5 @@
 language: node_js
-node_js:
-- node
-- lts/*
-- '8'
-- '7'
-- '6'
+node_js: node
 sudo: false
 cache: yarn
 notifications:
@@ -21,7 +16,7 @@ deploy:
   provider: releases
   api_key:
     secure: UQ710bDILz7B+GKtlFNY/u4jgccy+m2W+ZevAFGzsTedxAMybR6HtOCForrl5G2jUduyirCYR5u10COI/E7qrwDM/aXhC6jrCiHsb4Syhbn3S5F+sLOpiSCRfb++JGbs5urLY8JtOMDyxsn6XYiOHnx8A4cVI78PXcCotC5YZz7WPYPuT1w23qcHC6XFdSuAsJ+khYHVeXxjytmW7uYF6AtuRIwj+H3g+xzUVdUYF+L3T95nQw+0Q3ADlHJpJUUo+Jvp87e2ljYhzORQWKJ35/t3I0eR3VNIAQ71W5qkW0e/bOoE1Zd/zKxx7z8yDLCXLBrUDz/1QtzDZBn17JwsJlAOxTAIvo/kdQj8xepl0vCBFKUqF+FP8aqvZmxvAv05WKskn7DZ2z17CncizLe8T4xoGnXFPbdQGya7dg3Njw0+EKByVWfk24qCcH8i7J2NLH3yEeuTWiyMLbJRYxSOa6U34Oc5ODLp6lsWFQWkZWcd1AGNu5WsK9iMnR8i5BwFE/owV1aHaHK3Nmw6vfL9oPuS+dLoIhLnRxnopHksgp2AAHKcI/nLWvZ3HXVtzS+4eAhZwC2tJHhGlBJdnXuIEqyi835OYoZaT3NcQDWAhMAxm1/uKMf23U0QK4YUm76BqxWFBbNcCYxxJ9Ao1yFJj7RT1RhYw18fk9kHA4i/kss=
-  file: hubot-gitlab-connector-0.0.1.tgz
+  file: hubot-gitlab-connector-0.0.2.tgz
   on:
     repo: oltruong/hubot-gitlab-connector
     tags: true

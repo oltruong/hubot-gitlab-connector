@@ -21,6 +21,13 @@ Then add **hubot-gitlab-connector** to your `external-scripts.json`:
 ]
 ```
 
+Set 2 environment variables
+```
+HUBOT_GITLAB_URL: url of gitlab server
+HUBOT_GITLAB_TOKEN: access token
+```
+See https://docs.gitlab.com/ce/user/profile/personal_access_tokens.html for access tokens
+
 ## Sample Interaction
 
 ```
@@ -33,6 +40,11 @@ For all features, type
 ```
 hubot gitlab help
 ```
+
+## Contributing
+
+Granted, the script does not do much for now. If you have any request, please create an issue, or better, propose a pull request. 
+:)
 
 ## NPM Module
 
