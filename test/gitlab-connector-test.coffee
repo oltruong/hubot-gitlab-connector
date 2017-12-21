@@ -15,6 +15,10 @@ describe 'gitlab pipeline trigger', ->
       .reply 200, '[{"id":35,"token":"647a839ad36a23273f1c9056628735"}]'
 
     nock('http://gitlab.com')
+      .get('/api/v4/projects/123')
+      .reply 200, '{"id":123,"name":"toto", "web_url": "http://example.com/toto/toto-client"}'
+
+    nock('http://gitlab.com')
       .get('/api/v4/projects/123/repository/branches')
       .reply 200, '[{"name":"develop"},{"name":"master"}]'
 
@@ -36,7 +40,7 @@ describe 'gitlab pipeline trigger', ->
   it 'responds with pipeline info', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab pipeline trigger 123 dev']
-      ['hubot', '@alice Pipeline 7 created on branch develop']
+      ['hubot', '@alice Pipeline 7 created on branch develop of project toto. See http://example.com/toto/toto-client/pipelines/7']
     ]
 
 describe 'gitlab version', ->
@@ -63,7 +67,6 @@ describe 'gitlab version', ->
       ['hubot', '@alice gitlab version is 8.13.0-pre, revision 4e963fe']
     ]
 
-
 describe 'gitlab branches', ->
   beforeEach ->
     @room = helper.createRoom()
@@ -85,7 +88,8 @@ describe 'gitlab branches', ->
   it 'responds to gitlab branches', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab branches 123']
-      ['hubot', '@alice 2 branches found\ndevelop, last commit "c0e0062e", title "my commit" by "John Doe" created at "2017-12-13T10:03:59.000+01:00"\nmaster, last commit "c0e0062f", title "my first commit" by "Henry Doe" created at "2017-12-01T10:03:59.000+01:00"']
+      ['hubot',
+        '@alice 2 branches found\ndevelop, last commit "c0e0062e", title "my commit" by "John Doe" created at "2017-12-13T10:03:59.000+01:00"\nmaster, last commit "c0e0062f", title "my first commit" by "Henry Doe" created at "2017-12-01T10:03:59.000+01:00"']
     ]
 
 describe 'gitlab-connector commands without http connection', ->
