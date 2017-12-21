@@ -12,7 +12,6 @@ notifications:
 before_deploy:
   - npm pack
 deploy:
-  node_js: node
   - provider: npm
     email: olivier@nadeva.fr
     api_key:
