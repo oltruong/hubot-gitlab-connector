@@ -90,7 +90,7 @@ describe 'gitlab branches', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab branches 123']
       ['hubot',
-        '@alice 2 branches found\ndevelop\n  last commit \"c0e0062e\", title \"my commit\" by \"John Doe\" created at \"2017-12-13T10:03:59.000+01:00\"\n\nmaster\n  last commit \"c0e0062f\", title \"my first commit\" by \"Henry Doe\" created at \"2017-12-01T10:03:59.000+01:00\"']
+        '@alice 2 branches found\n- develop\n  last commit \"c0e0062e\", title \"my commit\" by \"John Doe\" created at \"2017-12-13T10:03:59.000+01:00\"\n\n- master\n  last commit \"c0e0062f\", title \"my first commit\" by \"Henry Doe\" created at \"2017-12-01T10:03:59.000+01:00\"']
     ]
 
 describe 'gitlab project', ->
@@ -115,7 +115,7 @@ describe 'gitlab project', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab projects toto']
       ['hubot',
-        '@alice 2 projects found matching name toto\ntoto, id:123\nWonderful project\n  web url: http://example.com/toto/toto-client, group: totogroup, last activity: 2017-12-07T13:48:40.953Z\n\ntoto2, id:246\nWonderful project returns\n  web url: http://example.com/toto/toto-client2, group: totogroup, last activity: 2017-12-09T13:48:40.953Z']
+        '@alice 2 projects found matching name toto\n- toto, id:123\n  Wonderful project\n  web url: http://example.com/toto/toto-client, group: totogroup, last activity: 2017-12-07T13:48:40.953Z\n\n\n- toto2, id:246\n  Wonderful project returns\n  web url: http://example.com/toto/toto-client2, group: totogroup, last activity: 2017-12-09T13:48:40.953Z']
     ]
 
 describe 'gitlab-connector commands without http connection', ->

@@ -128,10 +128,10 @@ getProjects = (gitlabClient, res, command) ->
       return
     data = JSON.parse body
     project_info = buildListInfo(data,formatProject)
-    res.reply "#{data.length} projects found matching name #{searchName}" + '\n' + project_info.join('\n\n')
+    res.reply "#{data.length} projects found matching name #{searchName}" + '\n' + project_info.join('\n\n\n')
 
 formatProject = (project) ->
-  "#{project.name}, id:#{project.id}" + '\n' + "#{project.description}"+ '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
+  "- #{project.name}, id:#{project.id}" + '\n' + "  #{project.description}"+ '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
 
 
 getBranches = (gitlabClient, res, command) ->
@@ -156,7 +156,7 @@ buildListInfo = (data, callback) ->
   return list
 
 formatBranch = (branch) ->
-  "#{branch.name}" + '\n' + "  last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\""
+  "- #{branch.name}" + '\n' + "  last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\""
 
 
 getVersion = (gitlabClient, res) ->
