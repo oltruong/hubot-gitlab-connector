@@ -8,6 +8,12 @@ A hubot script that communicates with Gitlab
 
 See [`src/gitlab-connector.coffee`](src/gitlab-connector.coffee) for full documentation.
 
+## Features
+- Search projects by name
+- Display branches of a given project
+- Trigger a pipeline
+- Display version
+
 ## Installation
 
 In hubot project repo, run:

@@ -57,6 +57,7 @@ describe 'gitlab version', ->
       new Promise((resolve, reject) ->
         setTimeout(resolve, 1000);
       )
+
   afterEach ->
     @room.destroy()
     nock.cleanAll()
@@ -89,7 +90,32 @@ describe 'gitlab branches', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab branches 123']
       ['hubot',
-        '@alice 2 branches found\ndevelop, last commit "c0e0062e", title "my commit" by "John Doe" created at "2017-12-13T10:03:59.000+01:00"\nmaster, last commit "c0e0062f", title "my first commit" by "Henry Doe" created at "2017-12-01T10:03:59.000+01:00"']
+        '@alice 2 branches found\ndevelop\n  last commit \"c0e0062e\", title \"my commit\" by \"John Doe\" created at \"2017-12-13T10:03:59.000+01:00\"\n\nmaster\n  last commit \"c0e0062f\", title \"my first commit\" by \"Henry Doe\" created at \"2017-12-01T10:03:59.000+01:00\"']
+    ]
+
+describe 'gitlab project', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    nock.disableNetConnect
+    nock('http://gitlab.com')
+      .get('/api/v4/projects?search=toto')
+      .reply 200, '[{"id":123,"name":"toto", "description":"Wonderful project", "web_url": "http://example.com/toto/toto-client", "namespace":{"name":"totogroup"}, "last_activity_at": "2017-12-07T13:48:40.953Z"},{"id":246,"name":"toto2", "description":"Wonderful project returns", "web_url": "http://example.com/toto/toto-client2", "namespace":{"name":"totogroup"}, "last_activity_at": "2017-12-09T13:48:40.953Z"}]'
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab projects toto')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000);
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab projects', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab projects toto']
+      ['hubot',
+        '@alice 2 projects found matching name toto\ntoto, id:123\nWonderful project\n  web url: http://example.com/toto/toto-client, group: totogroup, last activity: 2017-12-07T13:48:40.953Z\n\ntoto2, id:246\nWonderful project returns\n  web url: http://example.com/toto/toto-client2, group: totogroup, last activity: 2017-12-09T13:48:40.953Z']
     ]
 
 describe 'gitlab-connector commands without http connection', ->
@@ -104,12 +130,12 @@ describe 'gitlab-connector commands without http connection', ->
       expect(@room.messages).to.eql [
         ['bob', '@hubot gitlab help']
         ['hubot',
-          '@bob Here are all the available commands:\ngitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId\ngitlab branches projectId - shows the branches for the project with Id projectId\ngitlab version - returns version\ngitlab help - displays all available commands']
+          '@bob Here are all the available commands:\ngitlab projects searchName - shows the projects whose name contains searchName\ngitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId\ngitlab branches projectId - shows the branches for the project with Id projectId\ngitlab version - returns version\ngitlab help - displays all available commands']
       ]
   it 'responds to an unkown command', ->
     @room.user.say('averell', '@hubot gitlab whatever').then =>
       expect(@room.messages).to.eql [
         ['averell', '@hubot gitlab whatever']
         ['hubot',
-          "@averell Sorry, I did not understand command 'whatever'. Here are all the available commands:\ngitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId\ngitlab branches projectId - shows the branches for the project with Id projectId\ngitlab version - returns version\ngitlab help - displays all available commands"]
+          "@averell Sorry, I did not understand command 'whatever'. Here are all the available commands:\ngitlab projects searchName - shows the projects whose name contains searchName\ngitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId\ngitlab branches projectId - shows the branches for the project with Id projectId\ngitlab version - returns version\ngitlab help - displays all available commands"]
       ]

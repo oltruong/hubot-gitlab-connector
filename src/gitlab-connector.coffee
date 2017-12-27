@@ -28,6 +28,7 @@ module.exports = (robot) ->
 
     switch command[0]
       when "pipeline" then createPipeline(gitlabClient, res, command)
+      when "projects" then getProjects(gitlabClient, res, command)
       when "branches" then getBranches(gitlabClient, res, command)
       when "version" then getVersion(gitlabClient, res)
       when "help" then sendHelp(res)
@@ -69,12 +70,13 @@ findRightBranch = (res, gitlabClient, project, branchName, err, response, body) 
   branch_names.push branch.name for branch in data
 
   filter_branch_names = (item for item in branch_names when item.indexOf(branchName) != -1)
-  filter_branch_info = filter_branch_names.join('\n')
   if filter_branch_names.length == 0
-    res.reply "Sorry no branch found for #{branchName}. Here are the branches" + '\n' + "#{filter_branch_info}"
+    branch_names_info=branch_names.join('\n')
+    res.reply "Sorry no branch found for #{branchName}. Here are the branches" + '\n' + "#{branch_names_info}"
     return
 
   if filter_branch_names.length > 1
+    filter_branch_info = filter_branch_names.join('\n')
     res.reply "Sorry #{filter_branch_names.length} branches found for #{branchName}. Please be more specific. Here are the branches" + '\n' + "#{filter_branch_info}"
     return
   branch = filter_branch_names[0]
@@ -112,6 +114,26 @@ parseTrigger = (res, project, branch, err, response, body) ->
   data = JSON.parse body
   res.reply "Pipeline #{data.id} created on branch #{branch} of project #{project.name}. See #{project.web_url}/pipelines/#{data.id}"
 
+getProjects = (gitlabClient, res, command) ->
+  if (command.length != 2)
+    res.reply "Correct usage is gitlab projects \<searchName\>"
+    return
+  searchName = command[1]
+  gitlabClient.findProjects(searchName) (err, response, body) ->
+    if err
+      res.send "Encountered an error :( #{err}"
+      return
+    if response.statusCode isnt 200
+      res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
+      return
+    data = JSON.parse body
+    project_info = buildListInfo(data,formatProject)
+    res.reply "#{data.length} projects found matching name #{searchName}" + '\n' + project_info.join('\n\n')
+
+formatProject = (project) ->
+  "#{project.name}, id:#{project.id}" + '\n' + "#{project.description}"+ '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
+
+
 getBranches = (gitlabClient, res, command) ->
   if (command.length != 2)
     res.reply "Correct usage is gitlab branches \<projectId\>"
@@ -125,9 +147,17 @@ getBranches = (gitlabClient, res, command) ->
       res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
       return
     data = JSON.parse body
-    branch_infos = []
-    branch_infos.push "#{branch.name}, last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\"" for branch in data
-    res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n')
+    branch_infos = buildListInfo(data,formatBranch)
+    res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n\n')
+
+buildListInfo = (data, callback) ->
+  list = []
+  list.push callback(branch) for branch in data
+  return list
+
+formatBranch = (branch) ->
+  "#{branch.name}" + '\n' + "  last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\""
+
 
 getVersion = (gitlabClient, res) ->
   gitlabClient.version() (err, response, body)->
@@ -151,9 +181,10 @@ sendUnknownCommand = (res, command) ->
 HELP_VERSION = "gitlab version - returns version"
 HELP_DEFAULT = "gitlab help - displays all available commands"
 HELP_PIPELINE = "gitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId"
+HELP_PROJECT = "gitlab projects searchName - shows the projects whose name contains searchName"
 HELP_BRANCH = "gitlab branches projectId - shows the branches for the project with Id projectId"
 
-HELP = [HELP_PIPELINE, HELP_BRANCH, HELP_VERSION, HELP_DEFAULT].join('\n')
+HELP = [HELP_PROJECT, HELP_PIPELINE, HELP_BRANCH, HELP_VERSION, HELP_DEFAULT].join('\n')
 
 class GitlabClient
   constructor: (@robot, @url, @token) ->
@@ -169,6 +200,9 @@ class GitlabClient
 
   getProject: (projectId) ->
     request.call(this).path('/api/v4/projects/' + projectId).get()
+
+  findProjects: (searchName) ->
+    request.call(this).path('/api/v4/projects?search=' + searchName).get()
 
   getBranches: (projectId) ->
     request.call(this).path('/api/v4/projects/' + projectId + '/repository/branches').get()
