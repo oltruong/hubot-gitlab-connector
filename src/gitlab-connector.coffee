@@ -71,7 +71,7 @@ findRightBranch = (res, gitlabClient, project, branchName, err, response, body) 
 
   filter_branch_names = (item for item in branch_names when item.indexOf(branchName) != -1)
   if filter_branch_names.length == 0
-    branch_names_info=branch_names.join('\n')
+    branch_names_info = branch_names.join('\n')
     res.reply "Sorry no branch found for #{branchName}. Here are the branches" + '\n' + "#{branch_names_info}"
     return
 
@@ -115,23 +115,30 @@ parseTrigger = (res, project, branch, err, response, body) ->
   res.reply "Pipeline #{data.id} created on branch #{branch} of project #{project.name}. See #{project.web_url}/pipelines/#{data.id}"
 
 getProjects = (gitlabClient, res, command) ->
-  if (command.length != 2)
+  if (command.length == 1)
+    gitlabClient.findProjects() (err, response, body) ->
+      readProjects(res, err, response, body)
+  else if (command.length == 2)
+    searchName = command[1]
+    gitlabClient.findFilteredProjects(searchName) (err, response, body) ->
+      readProjects(res, err, response, body)
+  else
     res.reply "Correct usage is gitlab projects \<searchName\>"
     return
-  searchName = command[1]
-  gitlabClient.findProjects(searchName) (err, response, body) ->
-    if err
-      res.send "Encountered an error :( #{err}"
-      return
-    if response.statusCode isnt 200
-      res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
-      return
-    data = JSON.parse body
-    project_info = buildListInfo(data,formatProject)
-    res.reply "#{data.length} projects found matching name #{searchName}" + '\n' + project_info.join('\n\n\n')
+
+readProjects = (res, err, response, body)->
+  if err
+    res.send "Encountered an error :( #{err}"
+    return
+  if response.statusCode isnt 200
+    res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
+    return
+  data = JSON.parse body
+  project_info = buildListInfo(data, formatProject)
+  res.reply "#{data.length} projects found." + '\n' + project_info.join('\n\n\n')
 
 formatProject = (project) ->
-  "- #{project.name}, id:#{project.id}" + '\n' + "  #{project.description}"+ '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
+  "- #{project.name}, id:#{project.id}" + '\n' + "  #{project.description}" + '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
 
 
 getBranches = (gitlabClient, res, command) ->
@@ -147,7 +154,7 @@ getBranches = (gitlabClient, res, command) ->
       res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
       return
     data = JSON.parse body
-    branch_infos = buildListInfo(data,formatBranch)
+    branch_infos = buildListInfo(data, formatBranch)
     res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n\n')
 
 buildListInfo = (data, callback) ->
@@ -181,7 +188,7 @@ sendUnknownCommand = (res, command) ->
 HELP_VERSION = "gitlab version - returns version"
 HELP_DEFAULT = "gitlab help - displays all available commands"
 HELP_PIPELINE = "gitlab pipeline trigger projectId branchName - triggers a pipeline on a branch matching branchName for the project with Id projectId"
-HELP_PROJECT = "gitlab projects searchName - shows the projects whose name contains searchName"
+HELP_PROJECT = "gitlab projects searchName - shows the projects whose name contains searchName (optional)"
 HELP_BRANCH = "gitlab branches projectId - shows the branches for the project with Id projectId"
 
 HELP = [HELP_PROJECT, HELP_PIPELINE, HELP_BRANCH, HELP_VERSION, HELP_DEFAULT].join('\n')
@@ -201,8 +208,11 @@ class GitlabClient
   getProject: (projectId) ->
     request.call(this).path('/api/v4/projects/' + projectId).get()
 
-  findProjects: (searchName) ->
+  findFilteredProjects: (searchName) ->
     request.call(this).path('/api/v4/projects?search=' + searchName).get()
+
+  findProjects: () ->
+    request.call(this).path('/api/v4/projects').get()
 
   getBranches: (projectId) ->
     request.call(this).path('/api/v4/projects/' + projectId + '/repository/branches').get()
