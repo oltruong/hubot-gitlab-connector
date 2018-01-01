@@ -15,8 +15,9 @@
 # Author:
 #   Olivier Truong <olivier@oltruong.com>
 
-
-# /api/v4/projects?search=myproject"
+GitlabClient = require("./gitlab-client")
+getVersion = require("./parser-version")
+getProjects = require("./parser-project")
 
 module.exports = (robot) ->
   robot.respond /gitlab (.*)/, (res) ->
@@ -25,7 +26,6 @@ module.exports = (robot) ->
     command = res.match[1].split " "
 
     gitlabClient = new GitlabClient(robot, url, token)
-
     switch command[0]
       when "pipeline" then createPipeline(gitlabClient, res, command)
       when "projects" then getProjects(gitlabClient, res, command)
@@ -34,7 +34,6 @@ module.exports = (robot) ->
       when "help" then sendHelp(res)
       else
         sendUnknownCommand(res, res.match[1])
-
 
 createPipeline = (gitlabClient, res, command) ->
   if (command.length != 4 || command[1] != 'trigger')
@@ -91,7 +90,6 @@ readTrigger = (res, gitlabClient, project, branch, err, response, body)->
   if response.statusCode isnt 200
     res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
     return
-
   data = JSON.parse body
   if (data.length == 0)
     res.reply "No trigger found. Please create a trigger first"
@@ -114,48 +112,18 @@ parseTrigger = (res, project, branch, err, response, body) ->
   data = JSON.parse body
   res.reply "Pipeline #{data.id} created on branch #{branch} of project #{project.name}. See #{project.web_url}/pipelines/#{data.id}"
 
-getProjects = (gitlabClient, res, command) ->
-  if (command.length == 1)
-    gitlabClient.findProjects() (err, response, body) ->
-      readProjects(res, err, response, body)
-  else if (command.length == 2)
-    searchName = command[1]
-    gitlabClient.findFilteredProjects(searchName) (err, response, body) ->
-      readProjects(res, err, response, body)
-  else
-    res.reply "Correct usage is gitlab projects \<searchName\>"
-    return
-
-readProjects = (res, err, response, body)->
-  if err
-    res.send "Encountered an error :( #{err}"
-    return
-  if response.statusCode isnt 200
-    res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
-    return
-  data = JSON.parse body
-  project_info = buildListInfo(data, formatProject)
-  res.reply "#{data.length} projects found." + '\n' + project_info.join('\n\n\n')
-
-formatProject = (project) ->
-  "- #{project.name}, id:#{project.id}" + '\n' + "  #{project.description}" + '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
-
-
 getBranches = (gitlabClient, res, command) ->
   if (command.length != 2)
     res.reply "Correct usage is gitlab branches \<projectId\>"
     return
   projectId = command[1]
   gitlabClient.getBranches(projectId) (err, response, body) ->
-    if err
-      res.send "Encountered an error :( #{err}"
-      return
-    if response.statusCode isnt 200
-      res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
-      return
-    data = JSON.parse body
-    branch_infos = buildListInfo(data, formatBranch)
-    res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n\n')
+    parseResult(res, err, response, body, returnBranches)
+
+returnBranches = (res, body)->
+  data = JSON.parse body
+  branch_infos = buildListInfo(data, formatBranch)
+  res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n\n')
 
 buildListInfo = (data, callback) ->
   list = []
@@ -166,24 +134,21 @@ formatBranch = (branch) ->
   "- #{branch.name}" + '\n' + "  last commit \"#{branch.commit.short_id}\", title \"#{branch.commit.title}\" by \"#{branch.commit.author_name}\" created at \"#{branch.commit.created_at}\""
 
 
-getVersion = (gitlabClient, res) ->
-  gitlabClient.version() (err, response, body)->
-    readVersion(res, err, response, body)
-
-readVersion = (res, err, response, body)->
+parseResult = (res, err, response, body, successMethod)->
   if err
     throw new Error(body);
     res.send "Encountered an error :( #{err}"
     return
-  data = JSON.parse body
-  res.reply "gitlab version is #{data.version}, revision #{data.revision}"
+  if response.statusCode isnt 200
+    res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
+    return
+  successMethod(res, body)
 
 sendHelp = (res) ->
   res.reply 'Here are all the available commands:' + '\n' + HELP
 
 sendUnknownCommand = (res, command) ->
   res.reply "Sorry, I did not understand command '" + command + "'. Here are all the available commands:" + '\n' + HELP
-
 
 HELP_VERSION = "gitlab version - returns version"
 HELP_DEFAULT = "gitlab help - displays all available commands"
@@ -192,30 +157,3 @@ HELP_PROJECT = "gitlab projects searchName - shows the projects whose name conta
 HELP_BRANCH = "gitlab branches projectId - shows the branches for the project with Id projectId"
 
 HELP = [HELP_PROJECT, HELP_PIPELINE, HELP_BRANCH, HELP_VERSION, HELP_DEFAULT].join('\n')
-
-class GitlabClient
-  constructor: (@robot, @url, @token) ->
-
-  request = ->
-    @robot.http(@url).header('Accept', 'application/json').header('PRIVATE-TOKEN', @token)
-
-  version: () ->
-    request.call(this).path('/api/v4/version').get()
-
-  getTriggers: (projectId) ->
-    request.call(this).path('/api/v4/projects/' + projectId + '/triggers').get()
-
-  getProject: (projectId) ->
-    request.call(this).path('/api/v4/projects/' + projectId).get()
-
-  findFilteredProjects: (searchName) ->
-    request.call(this).path('/api/v4/projects?search=' + searchName).get()
-
-  findProjects: () ->
-    request.call(this).path('/api/v4/projects').get()
-
-  getBranches: (projectId) ->
-    request.call(this).path('/api/v4/projects/' + projectId + '/repository/branches').get()
-
-  triggerPipeline: (projectId, params) ->
-    request.call(this).header('Content-type', 'application/json').path('/api/v4/projects/' + projectId + '/trigger/pipeline').post(params)
