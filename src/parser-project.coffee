@@ -13,17 +13,7 @@ getProjects = (gitlabClient, res, command) ->
     return
 
 readProjects = (res, err, response, body)->
-  parseResult(res, err, response, body, returnProject)
-
-parseResult = (res, err, response, body, successMethod)->
-  if err
-    throw new Error(body);
-    res.send "Encountered an error :( #{err}"
-    return
-  if response.statusCode isnt 200
-    res.send "Request didn't come back HTTP 200 :( #{response.statusCode} #{body}"
-    return
-  successMethod(res, body)
+  utils.parseResult(res, err, response, body, returnProject)
 
 
 returnProject = (res, body)->
@@ -33,7 +23,6 @@ returnProject = (res, body)->
 
 formatProject = (project) ->
   "- #{project.name}, id:#{project.id}" + '\n' + "  #{project.description}" + '\n' + "  web url: #{project.web_url}, group: #{project.namespace.name}, last activity: #{project.last_activity_at}"
-
 
 
 module.exports = getProjects
