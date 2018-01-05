@@ -6,7 +6,7 @@ getBranches = (gitlabClient, res, command) ->
     return
   projectId = command[1]
   gitlabClient.getBranches(projectId) (err, response, body) ->
-    utils.parseResult(res, err, response, body, returnBranches)
+    utils.parseResult(res, err, response,  returnBranches,body)
 
 returnBranches = (res, body)->
   data = JSON.parse body

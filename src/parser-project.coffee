@@ -13,7 +13,7 @@ getProjects = (gitlabClient, res, command) ->
     return
 
 readProjects = (res, err, response, body)->
-  utils.parseResult(res, err, response, body, returnProject)
+  utils.parseResult(res, err, response, returnProject,body)
 
 
 returnProject = (res, body)->
