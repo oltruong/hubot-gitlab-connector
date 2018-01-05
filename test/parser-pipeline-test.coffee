@@ -31,7 +31,7 @@ describe 'gitlab pipeline trigger', ->
     co =>
       @room.user.say('alice', '@hubot gitlab pipeline trigger 123 dev')
       new Promise((resolve, reject) ->
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 1000)
       )
   afterEach ->
     @room.destroy()

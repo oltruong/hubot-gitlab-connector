@@ -18,7 +18,7 @@ describe 'gitlab version', ->
     co =>
       @room.user.say('alice', '@hubot gitlab version')
       new Promise((resolve, reject) ->
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 1000)
       )
 
   afterEach ->

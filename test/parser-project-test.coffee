@@ -44,7 +44,7 @@ describe 'gitlab project search', ->
     co =>
       @room.user.say('alice', '@hubot gitlab projects toto')
       new Promise((resolve, reject) ->
-        setTimeout(resolve, 1000);
+        setTimeout(resolve, 1000)
       )
   afterEach ->
     @room.destroy()
