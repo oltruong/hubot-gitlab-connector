@@ -20,6 +20,7 @@ createPipeline = require("./parser-pipeline")
 getVersion = require("./parser-version")
 getProjects = require("./parser-project")
 getBranches = require("./parser-branch")
+mergeRequests = require("./parser-merge-requests")
 help = require("./parser-help")
 
 module.exports = (robot) ->
@@ -33,6 +34,7 @@ module.exports = (robot) ->
       when "pipeline" then createPipeline(gitlabClient, res, command)
       when "projects" then getProjects(gitlabClient, res, command)
       when "branches" then getBranches(gitlabClient, res, command)
+      when "merge" then mergeRequests(gitlabClient, res, command)
       when "version" then getVersion(gitlabClient, res)
       when "help" then help.sendHelp(res)
       else

@@ -1,0 +1,34 @@
+Helper = require('hubot-test-helper')
+chai = require 'chai'
+expect = chai.expect
+nock = require('nock')
+co = require('co')
+
+helper = new Helper('../src/gitlab-connector.coffee')
+
+
+describe 'gitlab merge requests', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    nock.disableNetConnect
+    nock('http://gitlab.com')
+      .get('/api/v4/projects/123/merge_requests')
+      .reply 200, '[{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"acceptance","source_branch":"dev", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "opened"},{"iid":78, "title":"Merge production","target_branch":"production","source_branch":"acceptance", "upvotes":3,"downvotes":0, "updated_at":"2018-01-05T16:04:54.598Z", "author":{"name":"Jack"},"web_url":"http://gitlab.com/toto/merge_requests/78", "state": "merged"}]'
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab merge requests 123')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000)
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab merge requests', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab merge requests 123']
+      ['hubot',
+        '@alice 2 merge requests found\n- id: 68, Merge 1, from dev to acceptance\n  state: OPENED, updated at \"2018-01-04T16:04:54.598Z\", author: Bob\n  upvotes: 0, downvotes: 1\n  http://gitlab.com/toto/merge_requests/68\n\n- id: 78, Merge production, from acceptance to production\n  state: MERGED, updated at "2018-01-05T16:04:54.598Z", author: Jack\n  upvotes: 3, downvotes: 0\n  http://gitlab.com/toto/merge_requests/78']
+    ]
+
