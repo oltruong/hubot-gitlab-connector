@@ -7,7 +7,7 @@ co = require('co')
 helper = new Helper('../src/gitlab-connector.coffee')
 
 
-describe 'gitlab projects', ->
+describe 'projects', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect
@@ -32,7 +32,7 @@ describe 'gitlab projects', ->
         '@alice 2 projects found.\n- toto, id:123\n  Wonderful project\n  web url: http://example.com/toto/toto-client, group: totogroup, last activity: 2017-12-07T13:48:40.953Z\n\n\n- toto2, id:246\n  Wonderful project returns\n  web url: http://example.com/toto/toto-client2, group: totogroup, last activity: 2017-12-09T13:48:40.953Z']
     ]
 
-describe 'gitlab project search', ->
+describe 'project search', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect

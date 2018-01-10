@@ -22,8 +22,14 @@ class GitlabClient
   getBranches: (projectId) ->
     request.call(this).path('/api/v4/projects/' + projectId + '/repository/branches').get()
 
-  getMergeRequests: (projectId) ->
-    request.call(this).path('/api/v4/projects/' + projectId + '/merge_requests').get()
+  getMergeRequests: (projectId, filter) ->
+    filterPath=""
+    if (filter !="")
+      filterPath="?"+filter
+    request.call(this).path('/api/v4/projects/' + projectId + '/merge_requests'+filterPath).get()
+
+  acceptMergeRequest: (projectId, merge_iid) ->
+    request.call(this).path('/api/v4/projects/' + projectId + '/merge_requests/'+merge_iid+'/merge').put()
 
   triggerPipeline: (projectId, params) ->
     request.call(this).header('Content-type', 'application/json').path('/api/v4/projects/' + projectId + '/trigger/pipeline').post(params)

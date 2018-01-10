@@ -13,6 +13,7 @@ See [`src/gitlab-connector.coffee`](src/gitlab-connector.coffee) for full docume
 - Search projects by name
 - Display branches of a given project
 - Trigger a pipeline
+- Show or accept merge requests
 - Display version
 
 ## Installation
