@@ -1,15 +1,14 @@
 utils = require("./utils")
 
 createPipeline = (gitlabClient, res, command) ->
-  if (command.length != 4 || command[1] != 'trigger')
-    res.reply "Correct usage is gitlab pipeline trigger \<projectId\> \<branch\> "
-    return
-
-  projectId = command[2]
-  branchName = command[3]
-
-  gitlabClient.getProject(projectId) (err, response, body) ->
-    utils.parseResult(res, err, response, findBranches, body, gitlabClient, branchName)
+  if (gitlabClient? && res? && command?)
+    if (command.length != 4 || command[1] != 'trigger')
+      res.reply "Correct usage is gitlab pipeline trigger \<projectId\> \<branch\> "
+      return
+    projectId = command[2]
+    branchName = command[3]
+    gitlabClient.getProject(projectId) (err, response, body) ->
+      utils.parseResult(res, err, response, findBranches, body, gitlabClient, branchName)
 
 
 findBranches = (res, body, gitlabClient, branchName, projectId) ->

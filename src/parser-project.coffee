@@ -1,19 +1,20 @@
 utils = require("./utils")
 
 getProjects = (gitlabClient, res, command) ->
-  if (command.length == 1)
-    gitlabClient.getProjects() (err, response, body) ->
-      readProjects(res, err, response, body)
-  else if (command.length == 2)
-    searchName = command[1]
-    gitlabClient.getProjectsByName(searchName) (err, response, body) ->
-      readProjects(res, err, response, body)
-  else
-    res.reply "Correct usage is 'gitlab projects' or gitlab projects \<searchName\>'"
-    return
+  if (gitlabClient? && res? && command?)
+    if (command.length == 1)
+      gitlabClient.getProjects() (err, response, body) ->
+        readProjects(res, err, response, body)
+    else if (command.length == 2)
+      searchName = command[1]
+      gitlabClient.getProjectsByName(searchName) (err, response, body) ->
+        readProjects(res, err, response, body)
+    else
+      res.reply "Correct usage is 'gitlab projects' or gitlab projects \<searchName\>'"
+      return
 
 readProjects = (res, err, response, body)->
-  utils.parseResult(res, err, response, returnProject,body)
+  utils.parseResult(res, err, response, returnProject, body)
 
 
 returnProject = (res, body)->

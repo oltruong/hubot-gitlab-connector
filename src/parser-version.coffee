@@ -1,8 +1,9 @@
 utils = require("./utils")
 
 getVersion = (gitlabClient, res) ->
-  gitlabClient.getVersion() (err, response, body)->
-    utils.parseResult(res, err, response, readVersion,body)
+  if (gitlabClient? && res?)
+    gitlabClient.getVersion() (err, response, body)->
+      utils.parseResult(res, err, response, readVersion, body)
 
 readVersion = (res, body)->
   data = JSON.parse body

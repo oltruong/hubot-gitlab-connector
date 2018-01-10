@@ -1,16 +1,17 @@
 utils = require("./utils")
 
 getBranches = (gitlabClient, res, command) ->
-  if (command.length != 2)
-    res.reply "Correct usage is gitlab branches \<projectId\>"
-    return
-  projectId = command[1]
-  gitlabClient.getBranches(projectId) (err, response, body) ->
-    utils.parseResult(res, err, response,  returnBranches,body)
+  if (gitlabClient? && res? && command?)
+    if (command.length != 2)
+      res.reply "Correct usage is gitlab branches \<projectId\>"
+      return
+    projectId = command[1]
+    gitlabClient.getBranches(projectId) (err, response, body) ->
+      utils.parseResult(res, err, response, returnBranches, body)
 
 returnBranches = (res, body)->
   data = JSON.parse body
-  branch_infos =  utils.buildListInfo(data, formatBranch)
+  branch_infos = utils.buildListInfo(data, formatBranch)
   res.reply "#{data.length} branches found" + '\n' + branch_infos.join('\n\n')
 
 
