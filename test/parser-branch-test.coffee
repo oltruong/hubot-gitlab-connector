@@ -3,11 +3,10 @@ chai = require 'chai'
 expect = chai.expect
 nock = require('nock')
 co = require('co')
-
 helper = new Helper('../src/gitlab-connector.coffee')
 
 
-describe 'gitlab branches', ->
+describe 'branches', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect

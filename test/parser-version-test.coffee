@@ -6,7 +6,7 @@ co = require('co')
 
 helper = new Helper('../src/gitlab-connector.coffee')
 
-describe 'gitlab version', ->
+describe 'version', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect

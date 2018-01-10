@@ -6,7 +6,7 @@ co = require('co')
 
 helper = new Helper('../src/gitlab-connector.coffee')
 
-describe 'gitlab pipeline trigger', ->
+describe 'pipeline trigger', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect
