@@ -59,7 +59,7 @@ describe 'merge requests with filter', ->
     ]
 
 
-describe 'merge requests: accept', ->
+describe 'merge requests: accept with id', ->
   beforeEach ->
     @room = helper.createRoom()
     nock.disableNetConnect
@@ -81,5 +81,36 @@ describe 'merge requests: accept', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab merge requests 123 accept 68']
       ['hubot',
-        '@alice merge request 68 is now merged. See http://gitlab.com/toto/merge_requests/68']
+        '@alice merge request 68 is now merged.\nSee http://gitlab.com/toto/merge_requests/68']
+    ]
+
+
+describe 'merge requests: accept with branches', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    nock.disableNetConnect
+
+    nock('http://gitlab.com')
+    .get('/api/v4/projects/123/merge_requests?state=opened&source_branch=a&target_branch=b')
+    .reply 200, '[{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"acceptance","source_branch":"dev", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "closed"}]'
+
+    nock('http://gitlab.com')
+      .put('/api/v4/projects/123/merge_requests/68/merge')
+      .reply 200, '{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"b","source_branch":"a", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "merged"}'
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab merge requests 123 accept from a to b')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000)
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab merge requests', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab merge requests 123 accept from a to b']
+      ['hubot',
+        '@alice merge request 68 is now merged.\nSee http://gitlab.com/toto/merge_requests/68']
     ]
