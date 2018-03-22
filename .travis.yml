@@ -6,6 +6,8 @@ sudo: false
 cache: yarn
 notifications:
   email: false
+after_success:
+    - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
 before_deploy:
   - npm pack
 deploy:
@@ -26,7 +28,3 @@ deploy:
      repo: oltruong/hubot-gitlab-connector
      tags: true
      node_js: 'node'
-
-after_success:
-    - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
-      node_js: "node"
