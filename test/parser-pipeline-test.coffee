@@ -41,6 +41,6 @@ describe 'pipeline trigger', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab pipeline trigger 123 dev']
       ['hubot',
-        '@alice Pipeline 7 created on branch develop of project toto. See http://example.com/toto/toto-client/pipelines/7']
+        '@alice Pipeline 7 created on branch develop of project toto.\nSee http://example.com/toto/toto-client/pipelines/7']
     ]
 

@@ -48,6 +48,6 @@ readTrigger = (res, body, gitlabClient, branch, project)->
 
 parseTrigger = (res, body, branch, project) ->
   data = JSON.parse body
-  res.reply "Pipeline #{data.id} created on branch #{branch} of project #{project.name}. See #{project.web_url}/pipelines/#{data.id}"
+  res.reply "Pipeline #{data.id} created on branch #{branch} of project #{project.name}.\nSee #{project.web_url}/pipelines/#{data.id}"
 
 module.exports = createPipeline
