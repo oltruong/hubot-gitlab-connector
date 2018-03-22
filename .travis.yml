@@ -2,13 +2,12 @@ language: node_js
 node_js:
   - "node"
   - "lts/*"
-  - "8"
-  - "7"
-  - "6"
 sudo: false
 cache: yarn
 notifications:
   email: false
+after_success:
+    - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
 before_deploy:
   - npm pack
 deploy:

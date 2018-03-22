@@ -1,7 +1,7 @@
 # hubot-gitlab-connector
 
 [![Build Status](https://travis-ci.org/oltruong/hubot-gitlab-connector.svg?branch=master)](https://travis-ci.org/oltruong/hubot-gitlab-connector)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ba98acc265c64f819cd2403e32857a21)](https://www.codacy.com/app/oliv-truong/hubot-gitlab-connector?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oltruong/hubot-gitlab-connector&amp;utm_campaign=Badge_Grade)
+[![Coverage Status](https://coveralls.io/repos/github/oltruong/hubot-gitlab-connector/badge.svg)](https://coveralls.io/github/oltruong/hubot-gitlab-connector)
 [![npm (scoped)](https://img.shields.io/npm/v/hubot-gitlab-connector.svg)](https://www.npmjs.com/package/hubot-gitlab-connector)
 
 A hubot script that communicates with Gitlab
