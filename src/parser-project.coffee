@@ -10,7 +10,7 @@ getProjects = (gitlabClient, res, command) ->
       gitlabClient.getProjectsByName(searchName) (err, response, body) ->
         readProjects(res, err, response, body)
     else
-      res.reply "Correct usage is 'gitlab projects' or gitlab projects \<searchName\>'"
+      res.reply "Correct usage is 'gitlab projects' or gitlab projects \<searchName\>"
       return
 
 readProjects = (res, err, response, body)->
