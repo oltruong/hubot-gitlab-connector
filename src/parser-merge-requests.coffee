@@ -33,10 +33,10 @@ acceptOneMergeRequest = (res, body, gitlabClient, projectId, source_branch, targ
   data = JSON.parse body
   filter_merge_requests_iid = (item.iid for item in data when mergeRequestIsValid(item, source_branch, target_branch))
   if filter_merge_requests_iid.length == 0
-    res.reply "Sorry no merge request opened found from #{source_branch} to #{target_branch}"
+    res.reply "Sorry, no merge request opened found from #{source_branch} to #{target_branch}"
   else if filter_merge_requests_iid.length > 1
-    filter_merge_requests_names = (formatMerge(item) for mr in mergeRequestIsValid(item, source_branch, target_branch))
-    res.reply "Sorry #{filter_merge_requests_iid.length} merge requests opened from #{source_branch} to #{target_branch}. Please be more specific. Here are the merge requests" + '\n' + "#{filter_merge_requests_names.join('\n')}"
+    filter_merge_requests_names = (formatMerge(item) for item in data when mergeRequestIsValid(item, source_branch, target_branch))
+    res.reply "Sorry, #{filter_merge_requests_iid.length} merge requests opened from #{source_branch} to #{target_branch}. Please be more specific. Here are the merge requests" + '\n' + "#{filter_merge_requests_names}"
   else
     merge_request_iid = filter_merge_requests_iid[0]
     gitlabClient.acceptMergeRequest(projectId, merge_request_iid) (err, response, body) ->

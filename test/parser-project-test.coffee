@@ -56,3 +56,24 @@ describe 'project search', ->
       ['hubot',
         '@alice 2 projects found.\n- toto, id:123\n  Wonderful project\n  web url: http://example.com/toto/toto-client, group: totogroup, last activity: 2017-12-07T13:48:40.953Z\n\n\n- toto2, id:246\n  Wonderful project returns\n  web url: http://example.com/toto/toto-client2, group: totogroup, last activity: 2017-12-09T13:48:40.953Z']
     ]
+
+describe 'project incorrect arguments', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab projects toto invalid')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000)
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab projects invalid', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab projects toto invalid']
+      ['hubot',
+        '@alice Correct usage is \'gitlab projects\' or gitlab projects <searchName>']
+    ]
