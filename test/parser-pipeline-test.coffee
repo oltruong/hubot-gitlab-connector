@@ -79,7 +79,7 @@ describe 'pipeline trigger multiple branches', ->
     expect(@room.messages).to.eql [
       ['alice', '@hubot gitlab pipeline trigger 123 dev']
       ['hubot',
-        '@alice Sorry 2 branches found for dev. Please be more specific. Here are the branches\\ndevelop\\ndev2']
+        '@alice Sorry 2 branches found for dev. Please be more specific. Here are the branches\ndevelop\ndev2']
     ]
 
 describe 'pipeline trigger no branches', ->
