@@ -3,7 +3,7 @@ utils = require("./utils")
 createPipeline = (gitlabClient, res, command) ->
   if (gitlabClient? && res? && command?)
     if (command.length != 4 || command[1] != 'trigger')
-      res.reply "Correct usage is gitlab pipeline trigger \<projectId\> \<branch\> "
+      res.reply "Correct usage is gitlab pipeline trigger \<projectId\> \<branch\>"
       return
     projectId = command[2]
     branchName = command[3]
@@ -24,7 +24,7 @@ findRightBranch = (res, body, gitlabClient, branchName, project) ->
   filter_branch_names = (item for item in branch_names when item.indexOf(branchName) != -1)
   if filter_branch_names.length == 0
     branch_names_info = branch_names.join('\n')
-    res.reply "Sorry no branch found for #{branchName}. Here are the branches" + '\n' + "#{branch_names_info}"
+    res.reply "Sorry no branch found for #{branchName}. Here are the branches:" + '\n' + "#{branch_names_info}"
   else if filter_branch_names.length > 1
     filter_branch_info = filter_branch_names.join('\n')
     res.reply "Sorry #{filter_branch_names.length} branches found for #{branchName}. Please be more specific. Here are the branches" + '\n' + "#{filter_branch_info}"

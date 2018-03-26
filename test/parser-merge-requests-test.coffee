@@ -168,3 +168,31 @@ describe 'merge requests: accept with multiple branches', ->
       ['hubot',
         '@alice Sorry, 2 merge requests opened from a to b. Please be more specific. Here are the merge requests\n- id: 67, Merge 1, from a to b\n  state: OPENED, updated at \"2018-01-04T16:04:54.598Z\", author: Bob\n  upvotes: 0, downvotes: 1\n  http://gitlab.com/toto/merge_requests/68,- id: 68, Merge 1, from a to b\n  state: OPENED, updated at \"2018-01-04T16:04:54.598Z\", author: Bob\n  upvotes: 0, downvotes: 1\n  http://gitlab.com/toto/merge_requests/68']
     ]
+
+
+describe 'merge requests: accept with multiple branches', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    nock.disableNetConnect
+
+    nock('http://gitlab.com')
+    .get('/api/v4/projects/123/merge_requests?state=opened')
+    .reply 200, '[{"iid":67, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"b","source_branch":"a", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "opened"},{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"b","source_branch":"a", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "opened"}]'
+
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab merge requests 123 accept from a to b')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000)
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab merge requests', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab merge requests 123 accept from a to b']
+      ['hubot',
+        '@alice Sorry, 2 merge requests opened from a to b. Please be more specific. Here are the merge requests\n- id: 67, Merge 1, from a to b\n  state: OPENED, updated at \"2018-01-04T16:04:54.598Z\", author: Bob\n  upvotes: 0, downvotes: 1\n  http://gitlab.com/toto/merge_requests/68,- id: 68, Merge 1, from a to b\n  state: OPENED, updated at \"2018-01-04T16:04:54.598Z\", author: Bob\n  upvotes: 0, downvotes: 1\n  http://gitlab.com/toto/merge_requests/68']
+    ]
