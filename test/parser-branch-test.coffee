@@ -31,3 +31,25 @@ describe 'branches', ->
         '@alice 2 branches found\n- develop\n  last commit \"c0e0062e\", title \"my commit\" by \"John Doe\" created at \"2017-12-13T10:03:59.000+01:00\"\n\n- master\n  last commit \"c0e0062f\", title \"my first commit\" by \"Henry Doe\" created at \"2017-12-01T10:03:59.000+01:00\"']
     ]
 
+
+describe 'branches incorrect', ->
+  beforeEach ->
+    @room = helper.createRoom()
+    process.env.HUBOT_GITLAB_URL = "http://gitlab.com"
+    process.env.HUBOT_GITLAB_TOKEN = "secretToken"
+    co =>
+      @room.user.say('alice', '@hubot gitlab branches 123 invalid')
+      new Promise((resolve, reject) ->
+        setTimeout(resolve, 1000)
+      )
+  afterEach ->
+    @room.destroy()
+    nock.cleanAll()
+
+  it 'responds to gitlab branches help', ->
+    expect(@room.messages).to.eql [
+      ['alice', '@hubot gitlab branches 123 invalid']
+      ['hubot',
+        '@alice Correct usage is gitlab branches <projectId>']
+    ]
+

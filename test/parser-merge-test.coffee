@@ -91,8 +91,8 @@ describe 'merge requests: accept with branches', ->
     nock.disableNetConnect
 
     nock('http://gitlab.com')
-    .get('/api/v4/projects/123/merge_requests?state=opened&source_branch=a&target_branch=b')
-    .reply 200, '[{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"acceptance","source_branch":"dev", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "closed"}]'
+    .get('/api/v4/projects/123/merge_requests?state=opened')
+    .reply 200, '[{"iid":67, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"c","source_branch":"a", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "opened"},{"iid":68, "title":"Merge 1", "upvotes":0,"downvotes":1,"target_branch":"b","source_branch":"a", "updated_at":"2018-01-04T16:04:54.598Z", "author":{"name":"Bob"},"web_url":"http://gitlab.com/toto/merge_requests/68", "state": "opened"}]'
 
     nock('http://gitlab.com')
       .put('/api/v4/projects/123/merge_requests/68/merge')
